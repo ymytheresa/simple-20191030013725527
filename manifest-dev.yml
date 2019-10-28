@@ -1,0 +1,12 @@
+--- # use `cf push BoCAPIs -f manifest-dev.yml`
+applications:
+- instances: 1
+  timeout: 180
+  name: BoCAPIs
+  buildpack: java_buildpack
+  path: ./target/BoCAPIs-1.0-SNAPSHOT.jar
+  memory: 512MB
+  domain: mybluemix.net
+  host: bocapis
+  env:
+    spring.profiles.active: dev

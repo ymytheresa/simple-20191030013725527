@@ -1,0 +1,744 @@
+swagger: '2.0'
+info:
+  description: >-
+    Allow BOCHK customers to manipulate their accounts and perform financial
+    transactions in an innovative way.
+  title: Account Operations
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: account-operations
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: money-transfer-api
+    description: Money Transfer Api
+  - name: forex-api
+    description: Forex Api
+  - name: money-transfer-fps-api
+    description: Money Transfer Fps Api
+  - name: transactions-api
+    description: Transactions Api
+  - name: accounts-list-api
+    description: Accounts List Api
+  - name: third-party-name-api
+    description: Third Party Name Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/accounts:
+    get:
+      tags:
+        - accounts-list-api
+      summary: Get account list
+      description: Get a list of accounts owned by the customer
+      operationId: getListUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AccountSummary'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /api/accounts/third-party-name:
+    get:
+      tags:
+        - third-party-name-api
+      summary: Query the name of the owner of the specified non-BOCHK account
+      description: >-
+        Query the customer name of the third party account using a Faster
+        Payment System information or account number
+      operationId: getThirdPartyUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: account_info
+          in: query
+          description: account_info
+          required: true
+          type: string
+          default: '61111111'
+        - name: account_info_type
+          in: query
+          description: account_info_type
+          required: true
+          type: string
+          default: FPS_PHONE_NO
+          enum:
+            - FPS_PHONE_NO
+            - FPS_EMAIL
+            - FPS_ID
+            - ACCOUNT_NO
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/ThirdPartyResult'
+        '400':
+          description: inputRequired / accountNotFound / customerMustBeDifferent
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/accounts/{account_no}/forex':
+    post:
+      tags:
+        - forex-api
+      summary: Perform foreign currency exchange
+      description: >-
+        Convert one currency to another, and deposit the converted amount to
+        another account of the same customer
+      operationId: saveExchangeUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: exchange currency input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/ForexRequest'
+        - name: account_no
+          in: path
+          description: 'account_no '
+          required: true
+          type: string
+          default: '1288211111113'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/ForexResponse'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            inputRequired / dstAccountNoRequired / amountRequired /
+            dstCurrencyRequired / rateRequired / srcCurrencyRequired /
+            invalidAmount / currencyMustBeDifferent / invalidCurrency /
+            invalidAccountNo / invalidRate / insufficientAccountBalance /
+            currencyNotFound / customerMustBeTheSame
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/accounts/{account_no}/money-transfer':
+    post:
+      tags:
+        - money-transfer-api
+      summary: Money transfer to BOCHK accounts
+      description: Transfer money to other accounts in BOCHK
+      operationId: transferUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: cross client transfer input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/MoneyTransferRequest'
+        - name: account_no
+          in: path
+          description: account_no
+          required: true
+          type: string
+          default: '1287511111111'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/MoneyTransferResponse'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            inputRequired / amountRequired / accountMustBeDifferent /
+            invalidAmount / invalidAccountNo / invalidCurrency /
+            insufficientAccountBalance
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/accounts/{account_no}/money-transfer-fps':
+    post:
+      tags:
+        - money-transfer-fps-api
+      summary: Transfer money to other non-BOCHK bank accounts
+      description: Transfer money to third party through Faster Payment System
+      operationId: paymentUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: FPS transfer input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/MoneyTransferFpsRequest'
+        - name: account_no
+          in: path
+          description: account_no
+          required: true
+          type: string
+          default: '1288211111113'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/MoneyTransferFpsResponse'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            amountRequired / invalidAmount / currencyRequired / invalidCurrency
+            / invalidDstInfoType / dstInfoRequired / dstInfoTypeRequired /
+            dstAccountNotFound
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/accounts/{account_no}/transactions':
+    get:
+      tags:
+        - transactions-api
+      summary: Get account transactions list
+      description: Get a list of transactions for the specified account
+      operationId: listTransactionsUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: account_no
+          in: path
+          description: account_no
+          required: true
+          type: string
+          default: '1287511111111'
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Account_Txn'
+        '400':
+          description: invalidAccountNo / inputRequired
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  AccountBalance:
+    type: object
+    required:
+      - balance
+      - currency
+    properties:
+      balance:
+        type: number
+        format: double
+        example: 50000
+        description: Available balance
+      currency:
+        type: string
+        example: HKD
+        description: Currency
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+  AccountSummary:
+    type: object
+    required:
+      - account_no
+      - balances
+    properties:
+      account_no:
+        type: string
+        example: '1288212222223'
+        description: Account number
+      balances:
+        type: array
+        description: Available balances
+        items:
+          $ref: '#/definitions/AccountBalance'
+  Account_Txn:
+    type: object
+    required:
+      - account_no
+      - after_balance
+      - amount
+      - currency
+      - datetime
+      - txn_type
+    properties:
+      account_no:
+        type: string
+        example: '1287511111111'
+        description: Account number
+      account_no2:
+        type: string
+        example: '1268811111112'
+        description: Another account involved in the transaction
+      after_balance:
+        type: string
+        example: '4500.0'
+        description: Balance of the first account after the transaction
+      after_balance2:
+        type: string
+        example: '10500.0'
+        description: Balance of the other account after the transaction
+      amount:
+        type: string
+        example: '-500'
+        description: 'Amount, from the first account''s point of view'
+      amount2:
+        type: string
+        example: '500'
+        description: 'Amount, from the other account''s point of view'
+      currency:
+        type: string
+        example: HKD
+        description: Currency of account
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+      currency2:
+        type: string
+        example: HKD
+        description: Currency of the other account involved in the transaction
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+      datetime:
+        type: string
+        description: Timestamp of the transaction
+      fps_email:
+        type: string
+        description: Third party email address (for money transfer to third party)
+      fps_id:
+        type: string
+        description: >-
+          Third party Faster Payment System ID (for money transfer to third
+          party)
+      fps_phone_no:
+        type: string
+        description: Third party phone number (for money transfer to third party)
+      remark:
+        type: string
+        description: Free-text remark
+      stock_code:
+        type: string
+        description: Stock code (for stock purchase)
+      txn_type:
+        type: string
+        example: TRANSFER
+        description: Transaction type
+        enum:
+          - FOREX
+          - TRANSFER
+          - LOAN
+          - STOCK
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+  ForexRequest:
+    type: object
+    required:
+      - dst_account_no
+      - dst_amount
+      - dst_currency
+      - rate
+      - src_currency
+    properties:
+      dst_account_no:
+        type: string
+        example: '1287512222221'
+        description: Destination account number
+      dst_amount:
+        type: number
+        format: double
+        example: 200
+        description: Amount of destination currency to get
+      dst_currency:
+        type: string
+        example: CNY
+        description: Currency to convert to
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+      rate:
+        type: number
+        format: double
+        example: 115.64
+        description: Exchange rate against HKD100
+      remark:
+        type: string
+        description: Free-text remark
+      src_currency:
+        type: string
+        example: HKD
+        description: Original currency
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+  ForexResponse:
+    type: object
+    required:
+      - dst_balance_after
+      - rate
+      - src_balance_after
+    properties:
+      dst_balance_after:
+        type: number
+        format: double
+        example: 12500
+        description: Recipient account balance after the transaction
+      rate:
+        type: string
+        example: '788.08'
+        description: Exchange rate
+      src_balance_after:
+        type: number
+        format: double
+        example: 40500
+        description: Source account balance after the transaction
+  MoneyTransferFpsRequest:
+    type: object
+    required:
+      - amount
+      - currency
+      - dst_info
+      - dst_info_type
+    properties:
+      amount:
+        type: number
+        format: double
+        example: 150
+        description: Amount to transfer
+      currency:
+        type: string
+        example: HKD
+        description: Currency of amount to transfer
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+      dst_info:
+        type: string
+        example: '61111111'
+        description: 'Information of the recipient, depending on dst_info_type'
+      dst_info_type:
+        type: string
+        example: FPS_PHONE_NO
+        description: >-
+          Type of information entered in dst_info, either FPS_PHONE_NO,
+          FPS_EMAIL, or FPS_ID
+      remark:
+        type: string
+        description: Free-text remark
+  MoneyTransferFpsResponse:
+    type: object
+    required:
+      - dst_account_name
+      - src_balance_after
+    properties:
+      dst_account_name:
+        type: string
+        example: CHAN Fin Tech
+        description: Name of the destination account
+      src_balance_after:
+        type: number
+        format: double
+        example: 40500
+        description: Account balance after the transaction
+  MoneyTransferRequest:
+    type: object
+    required:
+      - amount
+      - currency
+      - dst_account_no
+    properties:
+      amount:
+        type: number
+        format: double
+        example: 150
+        description: Amount to transfer
+      currency:
+        type: string
+        example: HKD
+        description: Currency of amount to transfer
+        enum:
+          - HKD
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+      dst_account_no:
+        type: string
+        example: '1287512222221'
+        description: Account number of the recipient
+      remark:
+        type: string
+        description: Free-text remark
+  MoneyTransferResponse:
+    type: object
+    required:
+      - dst_account_name
+      - src_balance_after
+    properties:
+      dst_account_name:
+        type: string
+        example: CHAN Fin Tech
+        description: Name of the destination account
+      src_balance_after:
+        type: number
+        format: double
+        example: 40500
+        description: Account balance after the transaction
+  ThirdPartyResult:
+    type: object
+    properties:
+      name:
+        type: string
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getListUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/accounts'
+            - operations:
+                - getThirdPartyUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/accounts/third-party-name
+            - operations:
+                - saveExchangeUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/accounts/{account_no}/forex
+            - operations:
+                - transferUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/accounts/{account_no}/money-transfer
+            - operations:
+                - paymentUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/accounts/{account_no}/money-transfer-fps
+            - operations:
+                - listTransactionsUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/accounts/{account_no}/transactions
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes:
+      all: ''
+    authorizationUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/authorize
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

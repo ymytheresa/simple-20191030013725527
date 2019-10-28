@@ -1,0 +1,310 @@
+swagger: '2.0'
+info:
+  description: Enable BOCHK customers to pay the merchants by credit cards.
+  title: Card Operations
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: card-operations
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: credit-cards-api
+    description: Credit Cards Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/credit-cards:
+    get:
+      tags:
+        - credit-cards-api
+      summary: List the credit cards
+      description: List the credit cards owned by the customer
+      operationId: getCreditCardsByAccountIdUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CreditCard'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/credit-cards/{card_no}/payment':
+    post:
+      tags:
+        - credit-cards-api
+      summary: Perform credit card payment
+      description: >-
+        Pay the merchant using the specified credit card. Assume the merchant
+        (i.e. you) has already registered an account in the bank to receive
+        payment.
+      operationId: paymentUsingPOST_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: credit card payment input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/CreditCardPaymentRequest'
+        - name: card_no
+          in: path
+          description: card_no
+          required: true
+          type: string
+          default: '5228650000008331'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/CreditCardPaymentResponse'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            amountRequired / currencyRequired / invalidAmount /
+            creditCardNotFound / invalidCurrency / insufficientCredit
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/credit-cards/{card_no}/transactions':
+    get:
+      tags:
+        - credit-cards-api
+      summary: List credit card transaction records
+      description: List out all transactions involved with the specified credit card
+      operationId: getCreditCardByCardIdUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: card_no
+          in: path
+          description: card_no
+          required: true
+          type: string
+          default: '5228650000008331'
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CreditCardTransaction'
+        '400':
+          description: creditCardNotFound
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  CreditCard:
+    type: object
+    required:
+      - card_no
+      - card_type
+      - credit_limit
+      - credit_used
+      - currency
+      - open_date
+    properties:
+      card_no:
+        type: string
+        example: '4163180000008206'
+        description: Credit card number
+      card_type:
+        type: string
+        example: VISA
+        description: Credit card type
+        enum:
+          - VISA
+          - MASTERCARD
+          - UNIONPAY
+      credit_limit:
+        type: number
+        format: double
+        example: 500000
+      credit_used:
+        type: number
+        format: double
+        example: 0
+      currency:
+        type: string
+        example: HKD
+        description: Currency
+        enum:
+          - HKD
+          - USD
+          - CNY
+      open_date:
+        type: string
+        example: '2018-01-09'
+        description: Open date of the credit card
+  CreditCardPaymentRequest:
+    type: object
+    required:
+      - amount
+      - currency
+    properties:
+      amount:
+        type: number
+        format: double
+        example: 50
+        description: Amount to pay
+      currency:
+        type: string
+        example: HKD
+        description: Currency to pay (must match with credit card)
+        enum:
+          - HKD
+          - USD
+          - CNY
+      remark:
+        type: string
+        description: Free-text remark
+  CreditCardPaymentResponse:
+    type: object
+    required:
+      - credit_unused
+    properties:
+      credit_unused:
+        type: number
+        format: double
+        example: 5000
+        description: Unused credit
+  CreditCardTransaction:
+    type: object
+    required:
+      - amount
+      - card_no
+      - currency
+      - datetime
+    properties:
+      amount:
+        type: number
+        format: double
+        example: 400
+        description: Amount
+      card_no:
+        type: string
+        example: '4163180000008206'
+        description: Credit card number
+      currency:
+        type: string
+        example: HKD
+        description: Currency
+        enum:
+          - HKD
+          - USD
+          - CNY
+      datetime:
+        type: string
+        example: '2018-02-05T11:29:58Z'
+        description: Timestamp of the transaction
+      remark:
+        type: string
+        description: Free-text remark
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getCreditCardsByAccountIdUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/credit-cards'
+            - operations:
+                - paymentUsingPOST_1
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/credit-cards/{card_no}/payment
+            - operations:
+                - getCreditCardByCardIdUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/credit-cards/{card_no}/transactions
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes:
+      all: ''
+    authorizationUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/authorize
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

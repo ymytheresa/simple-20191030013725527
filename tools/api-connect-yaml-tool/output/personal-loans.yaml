@@ -1,0 +1,421 @@
+swagger: '2.0'
+info:
+  description: Expose our quick personal loan services via APIs for even more convenience.
+  title: Personal Loans
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: personal-loans
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: personal-loans-api
+    description: Personal Loans Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/personal-loans:
+    get:
+      tags:
+        - personal-loans-api
+      summary: Get personal loan list
+      description: Get personal loan list
+      operationId: getListUsingGET_2
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PersonalLoan'
+        '400':
+          description: accountNotFound
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /api/personal-loans/applications:
+    post:
+      tags:
+        - personal-loans-api
+      summary: Apply personal loan
+      description: Apply personal loan
+      operationId: createPersonalLoanUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: Apply personal loan input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/PersonalLoanApplicationRequest'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/PersonalLoanApplicationResponse'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            accountNotFound / invalidNoOfTerms / invalidAmount / invalidLoanRate
+            / invalidInstallmentAmount / customerMustBeTheSame / invalidCurrency
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /api/personal-loans/personalized-rate:
+    post:
+      tags:
+        - personal-loans-api
+      summary: Check personal loan interest rate
+      description: Check personal loan interest rate
+      operationId: checkPersonalizedRateUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: Check personal loan interest rate input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/PersonalLoanCheckRateRequest'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/PersonalLoanCheckRateResponse'
+        '201':
+          description: Created
+        '400':
+          description: invalidNoOfTerms / invalidAmount
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+  PersonalLoan:
+    type: object
+    required:
+      - amount
+      - currency
+      - installment_amount
+      - installment_day
+      - no_of_terms
+      - open_date
+      - original_amount
+      - rate
+    properties:
+      amount:
+        type: integer
+        format: int64
+        example: 1000000
+        description: Outstanding amount
+      currency:
+        type: string
+        example: HKD
+        description: Currency of the loan (must be HKD)
+        enum:
+          - HKD
+      installment_amount:
+        type: integer
+        format: int64
+        example: '226739.0'
+        description: Repayment amount in each installment
+      installment_day:
+        type: integer
+        format: int64
+        example: 14
+        description: Repayment month day
+      no_of_terms:
+        type: integer
+        format: int64
+        example: 24
+        description: Number of repayment terms
+      open_date:
+        type: string
+        example: '2018-02-05'
+        description: Loan open date
+      original_amount:
+        type: integer
+        format: int64
+        example: 1000000
+        description: Original loaned amount
+      rate:
+        type: string
+        example: '2.7'
+        description: Annual interest rate
+      remark:
+        type: string
+        description: Free-text remark
+  PersonalLoanApplicationRequest:
+    type: object
+    required:
+      - account_no
+      - amount
+      - currency
+      - installment_amount
+      - installment_day
+      - no_of_terms
+      - rate
+    properties:
+      account_no:
+        type: string
+        example: '1268813333332'
+        description: Account to receive loaned amount
+      amount:
+        type: integer
+        format: int64
+        example: 150000
+        description: Amount to loan
+      currency:
+        type: string
+        example: HKD
+        description: Currency to loan (must be HKD)
+        enum:
+          - HKD
+      installment_amount:
+        type: integer
+        format: int64
+        example: 34011
+        description: Repayment amount at each installment
+      installment_day:
+        type: integer
+        format: int64
+        example: 10
+        description: Repayment month day (1-31)
+      no_of_terms:
+        type: integer
+        format: int64
+        example: 24
+        description: Number of repayment terms
+      rate:
+        type: number
+        format: double
+        example: 2.7
+        description: Annual interest rate
+      remark:
+        type: string
+        description: Free-text remark
+  PersonalLoanApplicationResponse:
+    type: object
+    required:
+      - account_no
+      - amount
+      - balance_after
+      - currency
+      - installment_amount
+      - installment_day
+      - no_of_terms
+      - rate
+    properties:
+      account_no:
+        type: string
+        example: '1268813333332'
+        description: Account number to receive the loaned amount
+      amount:
+        type: integer
+        format: int64
+        example: 1000000
+        description: Amount loaned
+      balance_after:
+        type: number
+        format: double
+        example: 1500000
+        description: Balance of the account after receiving the loaned amount
+      currency:
+        type: string
+        example: HKD
+        description: Currency to loan (must be HKD)
+        enum:
+          - HKD
+      installment_amount:
+        type: integer
+        format: int64
+        example: 34011
+        description: Repayment amount at each installment
+      installment_day:
+        type: integer
+        format: int64
+        example: 10
+        description: Repayment month day (1-31)
+      no_of_terms:
+        type: integer
+        format: int64
+        example: 24
+        description: Number of repayment terms
+      rate:
+        type: number
+        format: double
+        example: 2.7
+        description: Annual interest rate
+      remark:
+        type: string
+        description: Free-text remark
+  PersonalLoanCheckRateRequest:
+    type: object
+    required:
+      - amount
+      - currency
+      - no_of_terms
+    properties:
+      amount:
+        type: integer
+        format: int64
+        example: 100000
+        description: Amount to loan
+      currency:
+        type: string
+        example: HKD
+        description: Currency to loan (must be HKD)
+        enum:
+          - HKD
+      no_of_terms:
+        type: integer
+        format: int64
+        example: 12
+        description: Number of repayment terms
+      remark:
+        type: string
+        description: Free-text remark
+  PersonalLoanCheckRateResponse:
+    type: object
+    required:
+      - amount
+      - currency
+      - installment_amount
+      - no_of_terms
+      - rate
+    properties:
+      amount:
+        type: integer
+        format: int64
+        example: 1000000
+        description: Amount to loan
+      currency:
+        type: string
+        example: HKD
+        description: Currency to loan (must be HKD)
+        enum:
+          - HKD
+      installment_amount:
+        type: integer
+        format: int64
+        example: 226739
+        description: Repayment amount in each installment
+      no_of_terms:
+        type: integer
+        format: int64
+        example: 24
+        description: Number of repayment terms
+      rate:
+        type: number
+        format: double
+        example: 2.7
+        description: Annual interest rate
+      remark:
+        type: string
+        description: Free-text remark
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getListUsingGET_2
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/personal-loans'
+            - operations:
+                - createPersonalLoanUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/personal-loans/applications
+            - operations:
+                - checkPersonalizedRateUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/personal-loans/personalized-rate
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes:
+      all: ''
+    authorizationUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/authorize
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

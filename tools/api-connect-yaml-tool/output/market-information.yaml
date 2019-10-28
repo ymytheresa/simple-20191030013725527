@@ -1,0 +1,230 @@
+swagger: '2.0'
+info:
+  description: Obtain common market data easily.
+  title: Market Information
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: market-information
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: market-info-api
+    description: Market Info Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/market-info/fx-rate:
+    get:
+      tags:
+        - market-info-api
+      summary: Get the rate of currency conversion
+      description: >-
+        Get the rate of currency conversion（The 100 - bit conversion standard of
+        Hong Kong dollar）
+      operationId: queryCurrencyRateUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: currency
+          in: query
+          description: currency
+          required: true
+          type: string
+          default: HKD
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/FX_Rate'
+        '400':
+          description: invalidCurrency
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /api/market-info/stock:
+    get:
+      tags:
+        - market-info-api
+      summary: Query stock price
+      description: Query stock price according to stock_code
+      operationId: getStockPriceBycodeUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: stock_code
+          in: query
+          description: stock_code
+          required: true
+          type: string
+          default: '1'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/Stock'
+        '400':
+          description: stockNotFound
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+  FX_Rate:
+    type: object
+    required:
+      - currency
+      - description
+      - rate
+    properties:
+      currency:
+        type: string
+        example: USD
+        description: Currency
+        enum:
+          - USD
+          - CNY
+          - AUD
+          - CAD
+          - CHF
+          - EUR
+          - GBP
+          - JPY
+          - NZD
+          - SGD
+          - THB
+          - BND
+          - ZAR
+          - DKK
+      description:
+        type: string
+        example: United States Dollar
+        description: Description
+      rate:
+        type: string
+        example: '788.08'
+        description: Exchange rate
+  Stock:
+    type: object
+    required:
+      - change
+      - change_pct
+      - name_en
+      - name_tc
+      - pe_ratio
+      - price
+      - stock_code
+      - turnover
+    properties:
+      change:
+        type: string
+        example: '-0.05'
+        description: Change
+      change_pct:
+        type: string
+        example: '-0.13'
+        description: Percentage change
+      name_en:
+        type: string
+        example: BOC HONG KONG
+        description: English name
+      name_tc:
+        type: string
+        example: 中銀香港
+        description: Chinese name
+      pe_ratio:
+        type: string
+        example: '7.39'
+        description: P/E ratio
+      price:
+        type: string
+        example: '38.8'
+        description: Price
+      stock_code:
+        type: string
+        example: '2388'
+        description: Stock code
+      turnover:
+        type: string
+        example: '309453000'
+        description: Turnover volume
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - queryCurrencyRateUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/market-info/fx-rate'
+            - operations:
+                - getStockPriceBycodeUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/market-info/stock'
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: application
+    scopes:
+      all: ''
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

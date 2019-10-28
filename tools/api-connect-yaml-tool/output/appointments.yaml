@@ -1,0 +1,285 @@
+swagger: '2.0'
+info:
+  description: Enable BOCHK customers to reach our team for professional services.
+  title: Appointments
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: appointments
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: appointments-api
+    description: Appointments Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/api/services/appointments/{phone_no}':
+    get:
+      tags:
+        - appointments-api
+      summary: Get customer appointment list
+      description: Get the customer appointment list from phone number
+      operationId: getAppoinmentsByAccountIdUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: phone_no
+          in: path
+          description: phone_no
+          required: true
+          type: string
+          default: '61234567'
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Appointment'
+        '400':
+          description: invalidPhoneNo
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      tags:
+        - appointments-api
+      summary: Create customer appointment
+      description: Create a new customer appointment
+      operationId: createAppointmentUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: Input values for creating appointment(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/AppointmentCreationRequest'
+        - name: phone_no
+          in: path
+          description: phone_no
+          required: true
+          type: string
+          default: '61234567'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/Appointment'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            branchCodeRequired / datetimeRequired / invalidBranchCode /
+            requestedServiceCategoryRequired / invalidRequestedServiceCategory /
+            invalidPhoneNo / invalidDatetime
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/services/appointments/{phone_no}/{appointment_id}':
+    delete:
+      tags:
+        - appointments-api
+      summary: Cancel customer appointment
+      description: Cancel customer appointment
+      operationId: cancelAppointmentUsingDELETE
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: phone_no
+          in: path
+          description: phone_no
+          required: true
+          type: string
+          default: '61234567'
+        - name: appointment_id
+          in: path
+          description: appointment_id
+          required: true
+          type: string
+          default: '1'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/AppointmentCancelResponse'
+        '204':
+          description: No Content
+        '400':
+          description: invalidPhoneNo / appointmentNotFound
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+definitions:
+  Appointment:
+    type: object
+    required:
+      - appointment_id
+      - branch_code
+      - datetime
+      - phone_no
+      - requested_service_category
+    properties:
+      appointment_id:
+        type: string
+        example: '3'
+        description: Unique ID of the appointment
+      branch_code:
+        type: string
+        example: '916'
+        description: Code of the branch reserved
+      datetime:
+        type: string
+        description: Time reserved
+      phone_no:
+        type: string
+        example: '61234567'
+        description: Phone number
+      requested_service_category:
+        type: string
+        example: LOAN
+        description: Service required
+        enum:
+          - WEALTH_MANAGEMENT
+          - PRIVATE_BANKING
+          - CORP_BANKING
+          - RMB_SERVICES
+          - CROSS_BORDER_SERVICES
+          - INVESTMENT
+          - MORTGAGE
+          - LOAN
+          - OTHERS
+      requested_service_detail:
+        type: string
+        example: Discuss about mortgage
+        description: Detail of service required
+  AppointmentCancelResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Status of the appointment cancellation
+  AppointmentCreationRequest:
+    type: object
+    required:
+      - branch_code
+      - datetime
+      - requested_service_category
+    properties:
+      branch_code:
+        type: string
+        example: '916'
+        description: Bank branch code (refer to the API to list bank branches)
+      datetime:
+        type: string
+        example: '2018-04-20T14:30:00+08:00'
+        description: Time to reserve
+      requested_service_category:
+        type: string
+        example: LOAN
+        description: Service required
+        enum:
+          - WEALTH_MANAGEMENT
+          - PRIVATE_BANKING
+          - CORP_BANKING
+          - RMB_SERVICES
+          - CROSS_BORDER_SERVICES
+          - INVESTMENT
+          - MORTGAGE
+          - LOAN
+          - OTHERS
+      requested_service_detail:
+        type: string
+        example: Discuss about mortgage
+        description: Detail of service required
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getAppoinmentsByAccountIdUsingGET
+                - createAppointmentUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/services/appointments/{phone_no}
+            - operations:
+                - cancelAppointmentUsingDELETE
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: >-
+                      https://bocapis.mybluemix.net/api/services/appointments/{phone_no}/{appointment_id}
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: application
+    scopes:
+      all: ''
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

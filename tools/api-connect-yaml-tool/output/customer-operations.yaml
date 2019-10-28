@@ -1,0 +1,119 @@
+swagger: '2.0'
+info:
+  description: Gain access to shared BOCHK customer profile data.
+  title: Customer Operations
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: customer-operations
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: profile-api
+    description: Profile Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/customer/profile:
+    get:
+      tags:
+        - profile-api
+      summary: Get the customer account information
+      description: Get the customer account information
+      operationId: getCustomerInfoUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/CustomerProfile'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  CustomerProfile:
+    type: object
+    required:
+      - address1
+      - address2
+      - address3
+      - full_name
+      - phone_no
+    properties:
+      address1:
+        type: string
+        example: 'Flat 88, Floor 23, Hacking House, FinTech Garden'
+        description: Address line 1
+      address2:
+        type: string
+        example: 'Shau Kei Wan, HK'
+        description: Address line 2
+      address3:
+        type: string
+        example: Hong Kong
+        description: Address line 3
+      full_name:
+        type: string
+        example: CHAN Fin Tech
+        description: Full name
+      phone_no:
+        type: string
+        example: '92222222'
+        description: Contact phone number
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getCustomerInfoUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/customer/profile'
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes:
+      all: ''
+    authorizationUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/authorize
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

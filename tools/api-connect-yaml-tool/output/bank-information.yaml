@@ -1,0 +1,253 @@
+swagger: '2.0'
+info:
+  description: >-
+    Give BOCHK customers and potential customers a quick summary of bank
+    branches and ATMs.
+  title: Bank Information
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: bank-information
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: bank-info-api
+    description: Bank Info Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/bank-info/atms:
+    get:
+      tags:
+        - bank-info-api
+      summary: Get a list of ATMs
+      description: Get a list of ATMs
+      operationId: queryATMUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Atm'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /api/bank-info/branches:
+    get:
+      tags:
+        - bank-info-api
+      summary: Get a list of bank branches
+      description: Get a list of bank branches
+      operationId: queryBranchUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Branch'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  AddressCoordinates:
+    type: object
+    required:
+      - latitude
+      - longitude
+    properties:
+      latitude:
+        type: number
+        format: double
+        example: 22.2796675
+        description: Latitude
+      longitude:
+        type: number
+        format: double
+        example: 114.1612875
+        description: Longitude
+  Atm:
+    type: object
+    required:
+      - address
+      - address_coordinates
+      - district_code
+      - district_name
+      - name
+      - services
+    properties:
+      address:
+        type: string
+        example: '3/F Bank of China Tower, 1 Garden Road, HK'
+        description: Address of where the ATM is located
+      address_coordinates:
+        description: Address of the ATM in coordinates
+        $ref: '#/definitions/AddressCoordinates'
+      business_status:
+        type: string
+        example: CONGESTED
+        description: How congested the ATM is
+      district_code:
+        type: string
+        example: central_western_district
+        description: District code
+      district_name:
+        type: string
+        example: Central & Western District
+        description: District name
+      name:
+        type: string
+        example: 3/F Bank of China Tower
+        description: Name of the ATM
+      services:
+        type: array
+        example: ATM_CENTRE
+        description: Services offered
+        items:
+          type: string
+  Branch:
+    type: object
+    required:
+      - address
+      - address_coordinates
+      - branch_code
+      - district_code
+      - district_name
+      - name
+      - opening_hours
+      - phone_no
+      - services
+    properties:
+      address:
+        type: string
+        example: >-
+          No 2, 1/F Shatin Galleria, 18-24 Shan Mei Street, Fo Tan, New
+          Territories
+        description: Address of the branch
+      address_coordinates:
+        example: central_western_district
+        description: Address of the branch in coordinates
+        $ref: '#/definitions/AddressCoordinates'
+      branch_code:
+        type: string
+        example: '688'
+        description: Branch code
+      business_status:
+        type: string
+        example: VERY_CONGESTED
+        description: How congested the branch is
+      district_code:
+        type: string
+        example: sha_tin_district
+        description: District code
+      district_name:
+        type: string
+        example: Shatin District
+        description: District name
+      name:
+        type: string
+        example: Fo Tan Branch
+        description: Name of the branch
+      opening_hours:
+        description: Opening hours
+        $ref: '#/definitions/OpeningHours'
+      phone_no:
+        type: string
+        example: +852 2691 7193
+        description: Phone number
+      services:
+        type: array
+        example: ATM_CENTRE
+        description: Services offered
+        items:
+          type: string
+  OpeningHours:
+    type: object
+    properties:
+      mon2fri:
+        type: string
+        example: '9:00 – 17:00'
+        description: Monday to Friday
+      sat:
+        type: string
+        example: '9:00 – 13:00'
+        description: Saturday
+      sunholiday:
+        type: string
+        example: Closed
+        description: Sunday and holidays
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - queryATMUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/bank-info/atms'
+            - operations:
+                - queryBranchUsingGET
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/bank-info/branches'
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: application
+    scopes:
+      all: ''
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

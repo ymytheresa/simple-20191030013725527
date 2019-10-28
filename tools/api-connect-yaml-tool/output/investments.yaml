@@ -1,0 +1,210 @@
+swagger: '2.0'
+info:
+  description: Open up a whole new world of opportunities for automated stock trading.
+  title: Investments
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: investments
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: investments-api
+    description: Investments Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/investments:
+    get:
+      tags:
+        - investments-api
+      summary: Get customer account stock list
+      description: Get customer account stock list
+      operationId: getListUsingGET_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Stock'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /api/investments/stock:
+    post:
+      tags:
+        - investments-api
+      summary: stock trading
+      description: stock trading
+      operationId: getStockUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: stock trading input values(JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/StockTradeRequest'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/StockTradeResponse'
+        '201':
+          description: Created
+        '400':
+          description: >-
+            actionRequired / unitPriceRequired / quantityRequired /
+            invalidAccountNo / customerMustBeTheSame / invalidStockCode /
+            invalidStockUnitPrice / insufficientStock
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+  Stock:
+    type: object
+    required:
+      - code
+      - quantity
+    properties:
+      code:
+        type: string
+        example: '2388'
+        description: Stock code
+      quantity:
+        type: integer
+        format: int64
+        example: 500
+        description: Quantity owned
+  StockTradeRequest:
+    type: object
+    required:
+      - action
+      - quantity
+      - settlement_account_no
+      - stock_code
+      - unit_price
+    properties:
+      action:
+        type: string
+        example: BUY
+        description: Action to take
+        enum:
+          - BUY
+          - SELL
+      quantity:
+        type: integer
+        format: int64
+        example: 500
+        description: Quantity to buy or sell
+      remark:
+        type: string
+        description: Free-text remark
+      settlement_account_no:
+        type: string
+        example: '1287511111111'
+        description: Number of the settlement account
+      stock_code:
+        type: string
+        example: '2388'
+        description: Numeric stock code
+      unit_price:
+        type: number
+        format: double
+        example: 38.8
+        description: Unit price of the stock
+  StockTradeResponse:
+    type: object
+    required:
+      - settlement_account_balance_after
+    properties:
+      settlement_account_balance_after:
+        type: number
+        format: double
+        example: 5003.2
+        description: Balance of the settlement account after the stock transaction
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getListUsingGET_1
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/investments'
+            - operations:
+                - getStockUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/api/investments/stock'
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes:
+      all: ''
+    authorizationUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/authorize
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

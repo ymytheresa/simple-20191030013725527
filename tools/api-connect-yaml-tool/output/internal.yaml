@@ -1,0 +1,165 @@
+swagger: '2.0'
+info:
+  description: Reset the API backend database to the factory default version.
+  title: Internal
+  contact:
+    name: FinTech Hackathon
+    url: 'https://www.bochkhackathon.com'
+    email: it_innovation_lab@bochk.com
+  x-ibm-name: internal
+host: bocapis.mybluemix.net
+basePath: /
+tags:
+  - name: clear-all-dbapi
+    description: Clear All DBAPI
+  - name: utility-api
+    description: Utility Api
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /internal/reset-all-db:
+    post:
+      tags:
+        - clear-all-dbapi
+      summary: Reset all databases
+      description: Reset all databases
+      operationId: initdbUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: Input (JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/ResetAllDBInput'
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: string
+        '201':
+          description: Created
+        '400':
+          description: 'confirmationRequired: You must provide confirmation'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /internal/reset-db:
+    post:
+      tags:
+        - utility-api
+      summary: Reset database
+      description: Reset database
+      operationId: initdbUsingPOST_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: input
+          description: Input (JSON)
+          required: false
+          schema:
+            $ref: '#/definitions/ResetDBInput'
+      responses:
+        '200':
+          description: successful
+          schema:
+            type: string
+        '201':
+          description: Created
+        '400':
+          description: 'confirmationRequired: You must provide confirmation'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  ResetAllDBInput:
+    type: object
+    required:
+      - are_you_sure
+    properties:
+      are_you_sure:
+        type: string
+        example: 'NO'
+        description: Are you sure to reset ALL the databases to factory default?
+  ResetDBInput:
+    type: object
+    required:
+      - are_you_sure
+    properties:
+      are_you_sure:
+        type: string
+        example: 'NO'
+        description: Are you sure to reset the database to factory default?
+x-ibm-configuration:
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.headers.x-app-sharedsecret
+              value: oY2EwOTRjb
+          version: 1.0.0
+          description: Set secret header
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - initdbUsingPOST
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/internal/reset-all-db'
+            - operations:
+                - initdbUsingPOST_1
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    target-url: 'https://bocapis.mybluemix.net/internal/reset-db'
+          otherwise: []
+          version: 1.0.0
+    catch: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes:
+      all: ''
+    authorizationUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/authorize
+    tokenUrl: >-
+      https://api.au.apiconnect.ibmcloud.com/bochkhackathon-2018/sandbox/oauth2/token
+security:
+  - OAuth2:
+      - all
+schemes:
+  - https

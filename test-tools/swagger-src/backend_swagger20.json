@@ -1,0 +1,1520 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "",
+    "version" : "1.0.14 (20180124)",
+    "title" : "BOCHK FinTech Hackathon 2018 API (Backend)",
+    "contact" : {
+      "url" : "http://www.bochkhackathon.com/",
+      "email" : "it_innovation_lab@bochk.com"
+    }
+  },
+  "host" : "bocapis.mybluemix.net",
+  "basePath" : "/api",
+  "schemes" : [ "https" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/bank-info/branches" : {
+      "get" : {
+        "tags" : [ "Bank Information" ],
+        "summary" : "List bank branches",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/branch"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/bank-info/atms" : {
+      "get" : {
+        "tags" : [ "Bank Information" ],
+        "summary" : "List ATMs",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/atm"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/market-info/fx-rate" : {
+      "get" : {
+        "tags" : [ "Market Information" ],
+        "summary" : "Query currency exchange rate",
+        "description" : "To be designed by IBM",
+        "parameters" : [ {
+          "name" : "currency",
+          "in" : "query",
+          "required" : true,
+          "type" : "string",
+          "enum" : [ "HKD", "USD", "CNY", "AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SGD", "THB", "BND", "ZAR", "DKK" ]
+        }, {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/fx_rate"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/market-info/stock" : {
+      "get" : {
+        "tags" : [ "Market Information" ],
+        "summary" : "Query stock price",
+        "parameters" : [ {
+          "name" : "stock_code",
+          "in" : "query",
+          "required" : true,
+          "type" : "string",
+          "description" : "Stock code",
+          "x-example" : "2388"
+        }, {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/stock_price"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/customer/profile" : {
+      "get" : {
+        "tags" : [ "Customer Operations" ],
+        "summary" : "Get customer profile",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/customer_profile"
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      }
+    },
+    "/accounts" : {
+      "get" : {
+        "tags" : [ "Account Operations" ],
+        "summary" : "List accounts (with balances)",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/account_summary"
+              }
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      }
+    },
+    "/accounts/third-party-name" : {
+      "get" : {
+        "tags" : [ "Account Operations" ],
+        "summary" : "Retrieve the name of a 3rd party bank or FPS account",
+        "description" : "For display in confirmation dialog of money transfer.",
+        "parameters" : [ {
+          "name" : "account_info_type",
+          "in" : "query",
+          "required" : true,
+          "type" : "string",
+          "enum" : [ "ACCOUNT_NO", "FPS_PHONE_NO", "FPS_EMAIL", "FPS_ID" ]
+        }, {
+          "name" : "account_info",
+          "in" : "query",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "name" : {
+                  "type" : "string"
+                }
+              },
+              "required" : [ "name" ]
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      }
+    },
+    "/accounts/{account_no}/transactions" : {
+      "get" : {
+        "tags" : [ "Account Operations" ],
+        "summary" : "List account transactions",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/account_transaction"
+              }
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "account_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/accounts/{account_no}/money-transfer" : {
+      "post" : {
+        "tags" : [ "Account Operations" ],
+        "summary" : "Transfer money (intra-bank)",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/money_transfer_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/money_transfer_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "account_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/accounts/{account_no}/money-transfer-fps" : {
+      "post" : {
+        "tags" : [ "Account Operations" ],
+        "summary" : "Transfer money (inter-bank, i.e. Faster Payment System)",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/money_transfer_fps_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/money_transfer_fps_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "account_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/accounts/{account_no}/forex" : {
+      "post" : {
+        "tags" : [ "Account Operations" ],
+        "summary" : "Exchange currency",
+        "description" : "Amount calculations:\n* new src_amount = src_amount - amount * (rate / 100)\n* new dst_amount = dst_amount + amount",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/forex_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/forex_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "account_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/credit-cards" : {
+      "get" : {
+        "tags" : [ "Card Operations" ],
+        "summary" : "List credit cards",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/credit_card"
+              }
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      }
+    },
+    "/credit-cards/{card_no}/transactions" : {
+      "get" : {
+        "tags" : [ "Card Operations" ],
+        "summary" : "List credit card transactions",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/credit_card_transaction"
+              }
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "card_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/credit-cards/{card_no}/payment" : {
+      "post" : {
+        "tags" : [ "Card Operations" ],
+        "summary" : "Perform credit card payment",
+        "description" : "The amount is paid to the pre-registered bank account of the API client organization.",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/credit_card_payment_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/credit_card_payment_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "card_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string",
+        "pattern" : "^\\d{16}$"
+      } ]
+    },
+    "/personal-loans" : {
+      "get" : {
+        "tags" : [ "Personal Loans" ],
+        "summary" : "List personal loans",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/personal_loan"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/personal-loans/personalized-rate" : {
+      "post" : {
+        "tags" : [ "Personal Loans" ],
+        "summary" : "Check personalized loan rate",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/personal_loan_check_rate_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/personal_loan_check_rate_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/personal-loans/applications" : {
+      "post" : {
+        "tags" : [ "Personal Loans" ],
+        "summary" : "Apply for personal loan",
+        "description" : "Personal loan is always in HKD",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/personal_loan_application_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/personal_loan_application_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/investments" : {
+      "get" : {
+        "tags" : [ "Investments" ],
+        "summary" : "List investments",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/stock"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input (e.g. account ID does not correspond to an investment account)"
+          }
+        }
+      }
+    },
+    "/investments/stock" : {
+      "post" : {
+        "tags" : [ "Investments" ],
+        "summary" : "Trade stock",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/stock_trade_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/stock_trade_response"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      }
+    },
+    "/services/appointments/{phone_no}" : {
+      "get" : {
+        "tags" : [ "Appointments" ],
+        "summary" : "List appointments",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/appointment"
+              }
+            }
+          },
+          "404" : {
+            "description" : "Status 404"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Appointments" ],
+        "summary" : "Create appointment",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/appointment_creation_request"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Appointment created",
+            "schema" : {
+              "$ref" : "#/definitions/appointment"
+            }
+          },
+          "400" : {
+            "description" : "Status 400"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "phone_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/services/appointments/{phone_no}/{appointment_id}" : {
+      "delete" : {
+        "tags" : [ "Appointments" ],
+        "summary" : "Cancel appointment",
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200"
+          },
+          "400" : {
+            "description" : "Status 400",
+            "schema" : {
+              "$ref" : "#/definitions/error_response"
+            }
+          },
+          "404" : {
+            "description" : "Status 404",
+            "schema" : {
+              "$ref" : "#/definitions/error_response"
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "phone_no",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      }, {
+        "name" : "appointment_id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/../auth" : {
+      "get" : {
+        "tags" : [ "Security" ],
+        "summary" : "Authentication",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200"
+          },
+          "401" : {
+            "description" : "Status 401"
+          }
+        },
+        "security" : [ {
+          "Basic authentication" : [ ]
+        } ]
+      }
+    },
+    "/../internal/reset-db" : {
+      "post" : {
+        "tags" : [ "**Hackathon Self-Service**" ],
+        "summary" : "Reset database",
+        "description" : "Reset the API backend database to the factory default version.",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "ibm-app-user",
+          "in" : "header",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "required" : [ "are_you_sure" ],
+            "properties" : {
+              "are_you_sure" : {
+                "type" : "string",
+                "enum" : [ "YES", "NO" ]
+              }
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Database reset successfully"
+          },
+          "400" : {
+            "description" : "Confirmation of \"YES\" is not specified in the request"
+          }
+        }
+      }
+    },
+    "/../internal/reset-all-db" : {
+      "post" : {
+        "tags" : [ "DevelopersOnly" ],
+        "summary" : "Reset all databases",
+        "description" : "Reset all API backend databases to the factory default version.",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "required" : [ "are_you_sure" ],
+            "properties" : {
+              "are_you_sure" : {
+                "type" : "string",
+                "enum" : [ "YES", "NO" ]
+              }
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Database reset successfully"
+          },
+          "400" : {
+            "description" : "Confirmation of \"YES\" is not specified in the request"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "Basic authentication" : {
+      "type" : "basic"
+    }
+  },
+  "definitions" : {
+    "money_transfer_request" : {
+      "type" : "object",
+      "required" : [ "amount", "currency", "dst_account_no" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "number",
+          "description" : "Amount to transfer (in dollar)"
+        },
+        "dst_account_no" : {
+          "type" : "string",
+          "description" : "Account to receive money"
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "money_transfer_fps_request" : {
+      "type" : "object",
+      "required" : [ "amount", "currency", "dst_info", "dst_info_type" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "number",
+          "description" : "Amount to transfer"
+        },
+        "dst_info_type" : {
+          "type" : "string",
+          "description" : "Type of information in the dst_info field",
+          "enum" : [ "FPS_PHONE_NO", "FPS_EMAIL", "FPS_ID" ]
+        },
+        "dst_info" : {
+          "type" : "string",
+          "description" : "Information of the money transfer destination"
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "forex_request" : {
+      "type" : "object",
+      "required" : [ "dst_account_no", "dst_amount", "dst_currency", "rate", "src_currency" ],
+      "properties" : {
+        "src_currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "dst_account_no" : {
+          "type" : "string",
+          "description" : "Destination account number"
+        },
+        "dst_currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "dst_amount" : {
+          "type" : "number",
+          "description" : "Destination amount (in dollar)"
+        },
+        "rate" : {
+          "type" : "number",
+          "description" : "Exchange rate"
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "personal_loan_check_rate_request" : {
+      "type" : "object",
+      "required" : [ "amount", "currency", "no_of_terms" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount to loan (in dollar)"
+        },
+        "no_of_terms" : {
+          "type" : "integer",
+          "description" : "Number of installments (monthly)"
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "personal_loan_application_request" : {
+      "type" : "object",
+      "required" : [ "account_no", "amount", "currency", "installment_amount", "installment_day", "no_of_terms", "rate" ],
+      "properties" : {
+        "account_no" : {
+          "type" : "string",
+          "description" : "Account to credit the loaned amount"
+        },
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount to loan (in HKD dollar)"
+        },
+        "no_of_terms" : {
+          "type" : "integer",
+          "description" : "Number of installments (monthly)"
+        },
+        "rate" : {
+          "type" : "number",
+          "description" : "Annual interest rate (%)"
+        },
+        "installment_amount" : {
+          "type" : "integer",
+          "description" : "Amount to repay in each installment"
+        },
+        "installment_day" : {
+          "type" : "integer",
+          "description" : "Day of month to repay",
+          "minimum" : 1,
+          "maximum" : 31
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "credit_card_payment_request" : {
+      "type" : "object",
+      "required" : [ "amount", "currency" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "number",
+          "description" : "Amount to pay"
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "stock_trade_request" : {
+      "type" : "object",
+      "required" : [ "action", "quantity", "settlement_account_no", "stock_code", "unit_price" ],
+      "properties" : {
+        "action" : {
+          "type" : "string",
+          "description" : "Type of trade",
+          "enum" : [ "BUY", "SELL" ]
+        },
+        "stock_code" : {
+          "type" : "string",
+          "pattern" : "^\\d+$"
+        },
+        "unit_price" : {
+          "type" : "number"
+        },
+        "quantity" : {
+          "type" : "integer"
+        },
+        "settlement_account_no" : {
+          "type" : "string"
+        },
+        "remark" : {
+          "type" : "string"
+        }
+      }
+    },
+    "appointment_creation_request" : {
+      "type" : "object",
+      "required" : [ "branch_code", "datetime", "requested_service_category" ],
+      "properties" : {
+        "branch_code" : {
+          "type" : "string"
+        },
+        "datetime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "requested_service_category" : {
+          "type" : "string",
+          "enum" : [ "WEALTH_MANAGEMENT", "PRIVATE_BANKING", "CORP_BANKING", "RMB_SERVICES", "CROSS_BORDER_SERVICES", "INVESTMENT", "MORTGAGE", "LOAN", "OTHERS" ]
+        },
+        "requested_service_detail" : {
+          "type" : "string"
+        }
+      }
+    },
+    "address_coordinates" : {
+      "type" : "object",
+      "required" : [ "latitude", "longitude" ],
+      "properties" : {
+        "latitude" : {
+          "type" : "number"
+        },
+        "longitude" : {
+          "type" : "number"
+        }
+      }
+    },
+    "opening_hours" : {
+      "type" : "object",
+      "properties" : {
+        "mon2fri" : {
+          "type" : "string"
+        },
+        "sat" : {
+          "type" : "string"
+        },
+        "sunholiday" : {
+          "type" : "string"
+        }
+      }
+    },
+    "branch" : {
+      "type" : "object",
+      "required" : [ "address", "address_coordinates", "branch_code", "district_code", "district_name", "name", "opening_hours", "phone_no", "services" ],
+      "properties" : {
+        "district_code" : {
+          "type" : "string"
+        },
+        "district_name" : {
+          "type" : "string"
+        },
+        "branch_code" : {
+          "type" : "string",
+          "pattern" : "^\\d+$"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "address" : {
+          "type" : "string"
+        },
+        "address_coordinates" : {
+          "$ref" : "#/definitions/address_coordinates"
+        },
+        "phone_no" : {
+          "type" : "string"
+        },
+        "opening_hours" : {
+          "$ref" : "#/definitions/opening_hours"
+        },
+        "services" : {
+          "type" : "array",
+          "example" : "ATM_CENTRE",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "business_status" : {
+          "type" : "string",
+          "enum" : [ "UNCONGESTED", "CONGESTED", "VERY_CONGESTED" ]
+        }
+      }
+    },
+    "atm" : {
+      "type" : "object",
+      "required" : [ "address", "address_coordinates", "district_code", "district_name", "name", "services" ],
+      "properties" : {
+        "district_code" : {
+          "type" : "string"
+        },
+        "district_name" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "address" : {
+          "type" : "string"
+        },
+        "address_coordinates" : {
+          "$ref" : "#/definitions/address_coordinates"
+        },
+        "services" : {
+          "type" : "array",
+          "example" : "CASH_DEPOSIT",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "business_status" : {
+          "type" : "string",
+          "enum" : [ "UNCONGESTED", "CONGESTED", "VERY_CONGESTED" ]
+        }
+      }
+    },
+    "stock_price" : {
+      "type" : "object",
+      "required" : [ "change", "change_pct", "name_en", "name_tc", "pe_ratio", "price", "stock_code", "turnover" ],
+      "properties" : {
+        "stock_code" : {
+          "type" : "string"
+        },
+        "name_en" : {
+          "type" : "string"
+        },
+        "name_tc" : {
+          "type" : "string"
+        },
+        "price" : {
+          "type" : "number"
+        },
+        "change" : {
+          "type" : "number",
+          "description" : "Absolute change"
+        },
+        "change_pct" : {
+          "type" : "number",
+          "description" : "Percentage change"
+        },
+        "pe_ratio" : {
+          "type" : "number"
+        },
+        "turnover" : {
+          "type" : "integer"
+        }
+      }
+    },
+    "fx_rate" : {
+      "type" : "object",
+      "required" : [ "currency", "description", "rate" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "description" : {
+          "type" : "string"
+        },
+        "rate" : {
+          "type" : "number"
+        }
+      }
+    },
+    "customer_profile" : {
+      "type" : "object",
+      "required" : [ "address1", "full_name", "phone_no" ],
+      "properties" : {
+        "full_name" : {
+          "type" : "string"
+        },
+        "address1" : {
+          "type" : "string"
+        },
+        "address2" : {
+          "type" : "string"
+        },
+        "address3" : {
+          "type" : "string"
+        },
+        "phone_no" : {
+          "type" : "string"
+        }
+      }
+    },
+    "account_summary" : {
+      "type" : "object",
+      "required" : [ "account_no", "balances" ],
+      "properties" : {
+        "account_no" : {
+          "type" : "string"
+        },
+        "balances" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/account_balance"
+          }
+        }
+      }
+    },
+    "account_balance" : {
+      "type" : "object",
+      "required" : [ "balance", "currency" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "balance" : {
+          "type" : "number"
+        }
+      }
+    },
+    "account_transaction" : {
+      "type" : "object",
+      "required" : [ "account_no", "after_balance", "amount", "currency", "datetime", "txn_type" ],
+      "properties" : {
+        "datetime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "txn_type" : {
+          "type" : "string",
+          "enum" : [ "FOREX", "TRANSFER", "LOAN", "STOCK" ]
+        },
+        "account_no" : {
+          "type" : "string"
+        },
+        "account_no2" : {
+          "type" : "string"
+        },
+        "fps_phone_no" : {
+          "type" : "string"
+        },
+        "fps_email" : {
+          "type" : "string"
+        },
+        "fps_id" : {
+          "type" : "string"
+        },
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "currency2" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "number"
+        },
+        "amount2" : {
+          "type" : "number"
+        },
+        "after_balance" : {
+          "type" : "number"
+        },
+        "after_balance2" : {
+          "type" : "number"
+        },
+        "stock_code" : {
+          "type" : "string"
+        },
+        "remark" : {
+          "type" : "string"
+        }
+      }
+    },
+    "stock" : {
+      "type" : "object",
+      "required" : [ "code", "quantity" ],
+      "properties" : {
+        "code" : {
+          "type" : "string"
+        },
+        "quantity" : {
+          "type" : "integer"
+        }
+      }
+    },
+    "personal_loan" : {
+      "type" : "object",
+      "required" : [ "amount", "currency", "installment_amount", "installment_day", "no_of_terms", "open_date", "original_amount", "rate" ],
+      "properties" : {
+        "open_date" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Creation date of loan application"
+        },
+        "original_amount" : {
+          "type" : "integer",
+          "description" : "Amount loaned (in dollar)"
+        },
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount outstanding (in dollar)"
+        },
+        "no_of_terms" : {
+          "type" : "integer",
+          "description" : "Number of installments (monthly)"
+        },
+        "rate" : {
+          "type" : "number",
+          "description" : "Annual interest rate (%)"
+        },
+        "installment_amount" : {
+          "type" : "integer",
+          "description" : "Amount to repay in each installment"
+        },
+        "installment_day" : {
+          "type" : "integer",
+          "description" : "Day of month to repay",
+          "minimum" : 1,
+          "maximum" : 31
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "personal_loan_check_rate_response" : {
+      "type" : "object",
+      "required" : [ "amount", "currency", "installment_amount", "no_of_terms", "rate" ],
+      "properties" : {
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount to loan (in dollar)"
+        },
+        "no_of_terms" : {
+          "type" : "integer",
+          "description" : "Number of installments (monthly)"
+        },
+        "rate" : {
+          "type" : "number",
+          "description" : "Annual interest rate (%)"
+        },
+        "installment_amount" : {
+          "type" : "integer",
+          "description" : "Amount to repay in each installment"
+        },
+        "remark" : {
+          "type" : "string",
+          "description" : "Free text remark"
+        }
+      }
+    },
+    "currency" : {
+      "type" : "string",
+      "enum" : [ "HKD", "USD", "CNY", "AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SGD", "THB", "BND", "ZAR", "DKK" ]
+    },
+    "credit_card" : {
+      "type" : "object",
+      "required" : [ "card_no", "card_type", "credit_limit", "credit_used", "currency", "open_date" ],
+      "properties" : {
+        "card_no" : {
+          "type" : "string",
+          "description" : "Credit card number (16 digits)",
+          "pattern" : "^\\d{16}$"
+        },
+        "card_type" : {
+          "type" : "string",
+          "enum" : [ "VISA", "MASTERCARD", "UNIONPAY" ]
+        },
+        "open_date" : {
+          "type" : "string",
+          "format" : "date"
+        },
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "credit_limit" : {
+          "type" : "number"
+        },
+        "credit_used" : {
+          "type" : "number"
+        }
+      }
+    },
+    "credit_card_transaction" : {
+      "type" : "object",
+      "required" : [ "amount", "card_no", "currency", "datetime" ],
+      "properties" : {
+        "datetime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "card_no" : {
+          "type" : "string"
+        },
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "amount" : {
+          "type" : "number"
+        },
+        "remark" : {
+          "type" : "string"
+        }
+      }
+    },
+    "money_transfer_response" : {
+      "type" : "object",
+      "required" : [ "dst_account_name", "src_balance_after" ],
+      "properties" : {
+        "src_balance_after" : {
+          "type" : "number"
+        },
+        "dst_account_name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "money_transfer_fps_response" : {
+      "type" : "object",
+      "required" : [ "dst_account_name", "src_balance_after" ],
+      "properties" : {
+        "src_balance_after" : {
+          "type" : "number"
+        },
+        "dst_account_name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "forex_response" : {
+      "type" : "object",
+      "required" : [ "dst_balance_after", "rate", "src_balance_after" ],
+      "properties" : {
+        "src_balance_after" : {
+          "type" : "number"
+        },
+        "dst_balance_after" : {
+          "type" : "number"
+        },
+        "rate" : {
+          "type" : "number"
+        }
+      }
+    },
+    "personal_loan_application_response" : {
+      "type" : "object",
+      "required" : [ "account_no", "amount", "balance_after", "currency", "installment_amount", "installment_day", "no_of_terms", "rate" ],
+      "properties" : {
+        "account_no" : {
+          "type" : "string"
+        },
+        "currency" : {
+          "$ref" : "#/definitions/currency"
+        },
+        "rate" : {
+          "type" : "number",
+          "description" : "Annual interest rate (%)"
+        },
+        "amount" : {
+          "type" : "integer"
+        },
+        "no_of_terms" : {
+          "type" : "integer",
+          "description" : "Number of installments (monthly)"
+        },
+        "installment_amount" : {
+          "type" : "integer"
+        },
+        "installment_day" : {
+          "type" : "integer",
+          "minimum" : 1,
+          "maximum" : 31
+        },
+        "remark" : {
+          "type" : "string"
+        },
+        "balance_after" : {
+          "type" : "number",
+          "description" : "Account balance after credit"
+        }
+      }
+    },
+    "credit_card_payment_response" : {
+      "type" : "object",
+      "required" : [ "credit_unused" ],
+      "properties" : {
+        "credit_unused" : {
+          "type" : "number"
+        }
+      }
+    },
+    "stock_trade_response" : {
+      "type" : "object",
+      "required" : [ "settlement_account_balance_after" ],
+      "properties" : {
+        "settlement_account_balance_after" : {
+          "type" : "number"
+        }
+      }
+    },
+    "appointment" : {
+      "type" : "object",
+      "required" : [ "appointment_id", "branch_code", "datetime", "phone_no", "requested_service_category" ],
+      "properties" : {
+        "appointment_id" : {
+          "type" : "string"
+        },
+        "phone_no" : {
+          "type" : "string"
+        },
+        "branch_code" : {
+          "type" : "string"
+        },
+        "datetime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "requested_service_category" : {
+          "type" : "string",
+          "enum" : [ "WEALTH_MANAGEMENT", "PRIVATE_BANKING", "CORP_BANKING", "RMB_SERVICES", "CROSS_BORDER_SERVICES", "INVESTMENT", "MORTGAGE", "LOAN", "OTHERS" ]
+        },
+        "requested_service_detail" : {
+          "type" : "string"
+        }
+      }
+    },
+    "error_response" : {
+      "type" : "object",
+      "required" : [ "code", "message" ],
+      "properties" : {
+        "code" : {
+          "type" : "string"
+        },
+        "message" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

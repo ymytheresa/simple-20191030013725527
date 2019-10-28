@@ -1,0 +1,110 @@
+<html lang="en" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Bank of China (Hong Kong)</title>
+  <link rel="stylesheet" href="https://cyper-bocapis.au-syd.mybluemix.net/css/lbsLgn.css"/>
+  <style type="text/css">
+    #login_button {
+      display: block;
+      background: url(https://cyper-bocapis.au-syd.mybluemix.net/images/btn-bg.jpg) repeat-x left top;
+      vertical-align: top;
+      line-height: 32px;
+      padding: 0 16px;
+      color: #fff;
+      height: 32px;
+      float: right;
+      font-size: 18px;
+    }
+
+    #login_button:hover {
+      cursor: pointer;
+    }
+
+    #login_button:focus {
+      outline: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="header">
+  <div id="header-top">
+    <a id="logo" title="Bank of China (Hong Kong)"><img src="https://cyper-bocapis.au-syd.mybluemix.net/images/logo.jpg"
+                                                        alt="Bank of China (Hong Kong)"/></a>
+  </div>
+  <div id="separator">
+    <div id="separator-red" style="margin-left: 88px;"></div>
+  </div>
+</div>
+
+
+<div id="content" style="font-size: 100%;">
+  <div id="content-div">
+    <div id="loginbox" style="height: 398px;">
+      <div id="loginbox-content">
+        <img id="boc-building" src="https://cyper-bocapis.au-syd.mybluemix.net/images/building.jpg" alt=""/>
+        <div id="loginbox-content-container">
+          <div class="left">
+            <h1>Login to Internet Banking (Hackathon)</h1>
+            <p>For those who have already registered / applied for Internet Banking Service</p>
+
+            <form method="POST" enctype="application/x-www-form-urlencoded"
+                  action="authorize">
+              <span>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required="required"/>
+              </span>
+              <span>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required="required"/>
+              </span>
+
+
+              <EI-INJECT-HIDDEN-INPUT-FIELDS/>
+
+              <EI-LOGINFAILED>
+                <p style="font-size:12px; color:red">Invalid username or password</p>
+              </EI-LOGINFAILED>
+              <EI-INTERNAL-CUSTOM-FORM-ERROR/>
+
+              <div>
+                <button id="login_button" name="login" value="true" class="apply" type="submit">Login</button>
+              </div>
+            </form>
+
+
+          </div>
+          <div class="right" style="height: 374px;">
+            <h2></h2>
+            <p style="font-size:12px;"><b>Important Reminder</b></p>
+            <p style="font-size:12px;">This is a simulation of the Bank of China (Hong Kong) internet banking login web
+              page. Please use the provided customer username and password to login.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+  <p></p>
+</div>
+
+<div id="footer">
+  <div id="footer-nav">
+    <img src="https://cyper-bocapis.au-syd.mybluemix.net/images/best-choice-icon.png" alt=""/>
+    <div>© BANK OF CHINA (HONG KONG) LIMITED. ALL RIGHTS RESERVED.</div>
+  </div>
+</div>
+</body>
+</html>
