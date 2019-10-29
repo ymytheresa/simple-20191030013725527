@@ -81,8 +81,11 @@ public class ClearAllDBAPI extends BaseRestApi {
                 if (url == null) {
                     System.out.println("******url is null");
                 }
-                String csvFilePath = url.getPath();
-                Collection<File> listFiles = FileUtils.listFiles(new File(csvFilePath), FileFilterUtils.suffixFileFilter("csv"), null);
+                String csvFilePath = url.getPath().replaceAll("!", "").replaceAll(".jar", "").replaceAll("file:", "");
+                System.out.println("𝔉, csvFilePath(" + csvFilePath + ")");
+                File tempFile = new File(csvFilePath);
+                System.out.println("𝔉, after tempFile, tempFile.exists()(" + tempFile.exists() + ")");
+                Collection<File> listFiles = FileUtils.listFiles(tempFile, FileFilterUtils.suffixFileFilter("csv"), null);
                 for (File file : listFiles) {
                     String fileName = file.getName();
                     System.out.println("Importing: " + fileName);
