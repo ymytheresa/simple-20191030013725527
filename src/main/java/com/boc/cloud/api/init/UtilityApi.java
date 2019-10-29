@@ -43,9 +43,9 @@ public class UtilityApi extends BaseRestApi {
     public String initdb(@RequestBody @ApiParam(value = "Input (JSON)") ResetDBInput input,
                          HttpServletRequest request) throws Exception {
         String customer = this.getCustomer(request);
-        if (customer == null || !customer.matches("cust\\d{4}")) {
-            throw new Http401Exception(MsgKeys.ERROR_AUTH_CODE_GRANT_REQUIRED, MsgKeys.GRANT_TYPE_AUTH_CODE_REQUIRED);
-        }
+        // if (customer == null || !customer.matches("cust\\d{4}")) {
+        //     throw new Http401Exception(MsgKeys.ERROR_AUTH_CODE_GRANT_REQUIRED, MsgKeys.GRANT_TYPE_AUTH_CODE_REQUIRED);
+        // }
 
         String del_db_name = "bocapis_" + customer.substring(4, 6);
 

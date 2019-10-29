@@ -31,48 +31,49 @@ public class SecurityInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
         throws Exception {
-        if (isDev) {
-            return true;
-        }
+        // if (isDev) {
+        //     return true;
+        // }
+        return true;
 
-        String api = request.getRequestURI();
-        logger.info("getRequestURI={}", api);
+        // String api = request.getRequestURI();
+        // logger.info("getRequestURI={}", api);
 
-        if (!api.startsWith("/api/")) {
-            // auth
-            // login form, etc.
-            return true;
-        }
+        // if (!api.startsWith("/api/")) {
+        //     // auth
+        //     // login form, etc.
+        //     return true;
+        // }
 
-        String secret = request.getHeader("x-app-sharedsecret");
-        logger.info("x-app-sharedsecret={}", secret);
+        // String secret = request.getHeader("x-app-sharedsecret");
+        // logger.info("x-app-sharedsecret={}", secret);
 
-        if (appSharedSecret.equals(secret)) {
+        // if (appSharedSecret.equals(secret)) {
 
-            // user name can be customer username or client key depending on grant type.
-            String username = request.getHeader("ibm-app-user");
-            logger.info("ibm-app-user={}", username);
+        //     // user name can be customer username or client key depending on grant type.
+        //     String username = request.getHeader("ibm-app-user");
+        //     logger.info("ibm-app-user={}", username);
 
-            boolean authCodeProtected = !api.startsWith("/api/market-info")
-                && !api.startsWith("/api/services/appointments") && !api.startsWith("/api/bank-info");
+        //     boolean authCodeProtected = !api.startsWith("/api/market-info")
+        //         && !api.startsWith("/api/services/appointments") && !api.startsWith("/api/bank-info");
 
-            if (authCodeProtected) {
-                // cust0101
-                if (!username.matches("cust\\d{4}")) {
-                    throw new Http401Exception(MsgKeys.ERROR_AUTH_CODE_GRANT_REQUIRED, MsgKeys.GRANT_TYPE_AUTH_CODE_REQUIRED);
-                }
-            } else {
-                // 81bdaa23-a7c3-4fdc-ac21-f308dd5c7703
-                if (username.length() != 36) {
-                    throw new Http401Exception(MsgKeys.ERROR_CLIENT_CRED_GRANT_REQUIRED, MsgKeys.GRANT_TYPE_CLIENT_CRENDENTIALS_REQUIRED);
-                }
-            }
+        //     if (authCodeProtected) {
+        //         // cust0101
+        //         if (!username.matches("cust\\d{4}")) {
+        //             throw new Http401Exception(MsgKeys.ERROR_AUTH_CODE_GRANT_REQUIRED, MsgKeys.GRANT_TYPE_AUTH_CODE_REQUIRED);
+        //         }
+        //     } else {
+        //         // 81bdaa23-a7c3-4fdc-ac21-f308dd5c7703
+        //         if (username.length() != 36) {
+        //             throw new Http401Exception(MsgKeys.ERROR_CLIENT_CRED_GRANT_REQUIRED, MsgKeys.GRANT_TYPE_CLIENT_CRENDENTIALS_REQUIRED);
+        //         }
+        //     }
 
-            return true;
+        //     return true;
 
-        } else {
-            throw new Http403Exception(MsgKeys.ERROR_FORBIDDEN, MsgKeys.FORBIDDEN);
-        }
+        // } else {
+        //     throw new Http403Exception(MsgKeys.ERROR_FORBIDDEN, MsgKeys.FORBIDDEN);
+        // }
     }
 
     @Override
