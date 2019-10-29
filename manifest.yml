@@ -5,6 +5,6 @@ applications:
   name: BoCAPIs
   buildpack: java_buildpack
   path: ./target/BoCAPIs-1.0-SNAPSHOT.jar
-  memory: 512MB
+  memory: 640MB
   domain: mybluemix.net
-  host: bocapis
+  host: bocapis-ty
