@@ -4,7 +4,7 @@
   "description": "upload csvs to cloudant using nodejs",
   "main": "app.js",
   "dependencies": {
-    "nano": "~4.1.1",
+    "nano": "~10.1.0",
     "async": "~0.2.9",
     "underscore": "~1.5.1"
   },
